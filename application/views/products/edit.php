@@ -103,23 +103,30 @@
                 <?php endif; ?>
                 <div class="form-group">
                   <label for="brands">Brands</label>
-                  <?php $brand_data = json_decode($product_data['brand_id']); ?>
+                  <?php $brand_data = json_decode($product_data['brand_id'], true); ?>
                   <select class="form-control select_group" id="brands" name="brands[]" multiple="multiple">
-                    <?php foreach ($brands as $k => $v): ?>
-                      <option value="<?php echo $v['id'] ?>" <?php if(in_array($v['id'], $brand_data)) { echo 'selected="selected"'; } ?>><?php echo $v['name'] ?></option>
-                    <?php endforeach ?>
+                    <?php if (isset($brands) && !empty($brands)): ?>
+                      <?php foreach ($brands as $k => $v): ?>
+                        <option value="<?php echo $v['id'] ?>" <?php if (isset($brand_data) && in_array($v['id'], $brand_data)) { echo 'selected="selected"'; } ?>><?php echo $v['name'] ?></option>
+                      <?php endforeach ?>
+                    <?php endif; ?>
                   </select> 
                 </div>
 
                 <div class="form-group">
-                  <label for="category">Category</label>
-                  <?php $category_data = json_decode($product_data['category_id']); ?>
-                  <select class="form-control select_group" id="category" name="category[]" multiple="multiple">
-                    <?php foreach ($category as $k => $v): ?>
-                      <option value="<?php echo $v['id'] ?>" <?php if(in_array($v['id'], $category_data)) { echo 'selected="selected"'; } ?>><?php echo $v['name'] ?></option>
-                    <?php endforeach ?>
-                  </select>
-                </div>
+  <label for="category">Category</label>
+  <?php 
+  // Initialize $category_data variable
+  $category_data = isset($product_data['category_id']) ? json_decode($product_data['category_id']) : [];
+  // Ensure $category_data is an array
+  $category_data = is_array($category_data) ? $category_data : [];
+  ?>
+  <select class="form-control select_group" id="category" name="category[]" multiple="multiple">
+    <?php foreach ($category as $k => $v): ?>
+      <option value="<?php echo $v['id'] ?>" <?php if(in_array($v['id'], $category_data)) { echo 'selected="selected"'; } ?>><?php echo $v['name'] ?></option>
+    <?php endforeach ?>
+  </select>
+</div>
 
                 <div class="form-group">
                   <label for="store">Store</label>
