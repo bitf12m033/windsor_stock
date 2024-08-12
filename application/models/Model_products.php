@@ -84,7 +84,7 @@ class Model_products extends CI_Model
 	public function getProductDataByStore($store_id, $search = null)
 	{
 		$this->db->select('*');
-		$this->db->from('products');
+		$this->db->from('product_attributes_view');
 		$this->db->where('store_id', $store_id);
 		$this->db->where('availability', 1);
 		if ($search) {

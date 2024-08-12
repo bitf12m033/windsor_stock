@@ -108,7 +108,7 @@
                     <?php foreach ($brands as $k => $v): ?>
                       <option value="<?php echo $v['id'] ?>" <?php if(in_array($v['id'], $brand_data)) { echo 'selected="selected"'; } ?>><?php echo $v['name'] ?></option>
                     <?php endforeach ?>
-                  </select>
+                  </select> 
                 </div>
 
                 <div class="form-group">
