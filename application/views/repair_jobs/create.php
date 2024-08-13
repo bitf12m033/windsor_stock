@@ -71,7 +71,7 @@
                 </div>
                 <div class="form-group">
                     <label for="service_id">Service</label>
-                    <select class="form-control" id="service_id" name="service_id">
+                    <select class="form-control select_group" id="service_id" name="service_id[]"  multiple="multiple">
                         <?php foreach ($services as $service): ?>
                         <option value="<?php echo $service['id']; ?>"><?php echo $service['name']; ?></option>
                         <?php endforeach; ?>
@@ -144,7 +144,7 @@
     $("#description").wysihtml5();
     $("#repairJobNav").addClass('active');
   
-    
+    $(".select_group").select2();
 
     $('#price, #advance_payment').on('input', function() {
       calculateRemainingPayment();

@@ -60,15 +60,22 @@
                 <label for="item_imei">Item IMEI</label>
                 <input type="text" class="form-control" id="item_imei" name="item_imei" value="<?php echo $repair_job_data['item_imei']; ?>" autocomplete="off">
               </div>
+
               <div class="form-group">
-                <label for="service">Service</label>
-                <select class="form-control" id="service_id" name="service_id">
-                    <?php foreach ($services as $service): ?>
-                    <option value="<?php echo $service['id']; ?>" <?php if($repair_job_data['service_id'] == $service['id']) echo 'selected'; ?>>
-                        <?php echo $service['name']; ?>
-                    </option>
-                    <?php endforeach; ?>
-                </select>
+                <label for="service_id">Service</label>
+                <?php 
+                  // Initialize $service_data variable
+                  $service_data = isset($repair_job_data['service_id']) ? explode(',', $repair_job_data['service_id']) : [];
+                  $service_data = is_array($service_data) ? $service_data : []; 
+                ?>
+                  
+                  <select class="form-control select_group" id="service_id" name="service_id[]"  multiple="multiple">
+                      <?php foreach ($services as $k =>$v): ?>
+                        <option value="<?php echo $v['id']; ?>" <?php if(in_array($v['id'] ,$service_data)) echo 'selected="selected"'; ?>>
+                            <?php echo $v['name']; ?>
+                        </option>
+                      <?php endforeach; ?>
+                  </select>
                 </div>
                 <div class="form-group">
                   <label for="price">Total Price</label>
@@ -136,7 +143,7 @@
     $("#description").wysihtml5();
     $("#repairJobNav").addClass('active');
 
-    
+    $(".select_group").select2();
 
     $('#price, #advance_payment').on('input', function() {
       calculateRemainingPayment();

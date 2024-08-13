@@ -180,12 +180,12 @@ $j(document).ready(function() {
     var printWindow = window.open('', '_blank');
     printWindow.document.open();
 
-    printWindow.document.write('<html><head><title> Windsor Repair Job Details </title>');
+    printWindow.document.write('<html><head><title> Repair Job Details </title>');
       printWindow.document.write('<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">');
       printWindow.document.write('<style>@media print { body { margin: 0; font-family: Arial, sans-serif; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; } @page { size: A4; margin: 0; } }</style>');
       printWindow.document.write('</head><body>');
       printWindow.document.write('<div style="width: 210mm; height: 297mm; padding: 20px;">'); // A4 size with padding
-      printWindow.document.write('<h1 style="text-align: center;">Windsor Repair Job Detail</h1>');
+      printWindow.document.write('<h1 style="text-align: center;">Repair Job Detail</h1>');
       printWindow.document.write('<h2 style="text-align: center;">Ticket #: ' + data[0] + '</h2>'); // Display Ticket # after the headline
       printWindow.document.write('<table>');
       printWindow.document.write('<thead><tr><th>Attribute</th><th>Value</th></tr></thead>');

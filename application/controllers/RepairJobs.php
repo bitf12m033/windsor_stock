@@ -92,8 +92,11 @@ class RepairJobs extends Admin_Controller
         $this->form_validation->set_rules('remaining_payment', 'Remaining Payment', 'required|numeric');
     
         $this->form_validation->set_rules('due_date', 'Due Date', 'trim|required|callback_validate_due_date');        $this->form_validation->set_rules('status', 'Status', 'trim|required');
-    
+       
         if ($this->form_validation->run() == TRUE) {
+            // echo '<pre>';
+            // print_r($_POST);
+            // exit;
             $price = $this->input->post('price');
             $advance_payment = $this->input->post('advance_payment');
             $remaining_payment = $this->input->post('remaining_payment');
@@ -110,6 +113,8 @@ class RepairJobs extends Admin_Controller
             {
                 $store_id = $this->session->userdata('store_id');
             }
+
+            $services = $this->input->post('service_id');
             $data = array(
                 'customer_name' => $this->input->post('customer_name'),
                 'customer_email' => $this->input->post('customer_email'),
@@ -118,7 +123,7 @@ class RepairJobs extends Admin_Controller
                 'item_imei' => $this->input->post('item_imei'),
                 'price' => $price,
                 'due_date' => $this->input->post('due_date'),
-                'service_id' => $this->input->post('service_id'),
+                'service_id' => implode(',', $services),
                 'status' => $this->input->post('status'),
                 'notes' => $this->input->post('notes'),
                 'store_id' => $store_id,
@@ -175,7 +180,7 @@ class RepairJobs extends Admin_Controller
             {
                 $store_id = $this->session->userdata('store_id');
             }
-
+            $services = $this->input->post('service_id');
             // Update the repair job data
             $data = array(
                 'customer_name' => $this->input->post('customer_name'),
@@ -186,7 +191,7 @@ class RepairJobs extends Admin_Controller
                 'price' => $this->input->post('price'),
                 'due_date' => $this->input->post('due_date'),
                 'status' => $this->input->post('status'),
-                'service_id' => $this->input->post('service_id'),
+                'service_id' => implode(',', $services),
                 'store_id' => $store_id,
                 'notes' => $this->input->post('notes'),
                 'updated_at' => date('Y-m-d H:i:s')
@@ -206,8 +211,13 @@ class RepairJobs extends Admin_Controller
             $repair_job_data = $this->model_repair_jobs->getRepairJobData($id);
             $this->data['repair_job_data'] = $repair_job_data;
             $this->data['services'] = $this->model_service->getServiceData();
-            $this->data['stores'] = $this->model_stores->getActiveStore();            
+            $this->data['stores'] = $this->model_stores->getActiveStore();   
+            // echo '<pre>';
+            // print_r($this->data);
+            // exit;         
             $this->render_template('repair_jobs/edit', $this->data); 
+
+
         }   
     }
 
