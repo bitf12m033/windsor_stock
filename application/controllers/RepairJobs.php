@@ -94,9 +94,7 @@ class RepairJobs extends Admin_Controller
         $this->form_validation->set_rules('due_date', 'Due Date', 'trim|required|callback_validate_due_date');        $this->form_validation->set_rules('status', 'Status', 'trim|required');
        
         if ($this->form_validation->run() == TRUE) {
-            // echo '<pre>';
-            // print_r($_POST);
-            // exit;
+           
             $price = $this->input->post('price');
             $advance_payment = $this->input->post('advance_payment');
             $remaining_payment = $this->input->post('remaining_payment');
