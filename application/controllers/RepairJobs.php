@@ -29,34 +29,48 @@ class RepairJobs extends Admin_Controller
     {
         $result = array('data' => array());
         $search = $this->input->get('search');
-
+    
         if($this->session->userdata('is_admin')) {
             $data = $this->model_repair_jobs->getRepairJobData(null, $search);
         } else {
             $store_id = $this->session->userdata('store_id');
             $data = $this->model_repair_jobs->getRepairJobDataByStore($store_id, $search);
         }
-
+    
         foreach ($data as $key => $value) {
             $buttons = '';
             if($this->session->userdata('is_admin') || in_array('updateRepairJob', $this->permission)) {
                 $buttons .= '<a href="'.base_url('repairJobs/update/'.$value['id']).'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
             }
-
+    
             if($this->session->userdata('is_admin') || in_array('deleteRepairJob', $this->permission)) { 
                 $buttons .= ' <button type="button" class="btn btn-default" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>';
             }
-
-            if(strtolower($value['status']) == 'completed') {
-                $status = '<span class="label label-success">Completed</span>';
+            
+            $status_class = '';
+            switch ($value['status']) {
+                case 'pending':
+                    $status_class = 'btn-warning';
+                    break;
+                case 'cancelled':
+                    $status_class = 'btn-danger';
+                    break;
+                case 'completed':
+                    $status_class = 'btn-success';
+                    break;
             }
-            elseif (strtolower($value['status']) == 'pending') {
-                $status = '<span class="label label-warning">Pending</span>';
-            }
-            else {
-                $status = '<span class="label label-danger">Cancelled</span>';
-            }
-           
+            $status = '<div class="btn-group">';
+            $status .= '<button type="button" class="btn '.$status_class .' dropdown-toggle" data-toggle="dropdown">';
+            $status .= $value['status'];
+            $status .= ' <span class="caret"></span>';
+            $status .= '</button>';
+            $status .= '<ul class="dropdown-menu">';
+            $status .= '<li><a href="#" class="status-link" data-id="'.$value['id'].'" data-status="pending">Pending</a></li>';
+            $status .= '<li><a href="#" class="status-link" data-id="'.$value['id'].'" data-status="cancelled">Cancelled</a></li>';
+            $status .= '<li><a href="#" class="status-link" data-id="'.$value['id'].'" data-status="completed">Completed</a></li>';
+            $status .= '</ul>';
+            $status .= '</div>';
+    
             $result['data'][$key] = array(
                 $value['ticket_number'],
                 $value['customer_name'],
@@ -72,7 +86,7 @@ class RepairJobs extends Admin_Controller
                 $buttons
             );
         }
-
+    
         echo json_encode($result);
     }
 
@@ -264,6 +278,32 @@ class RepairJobs extends Admin_Controller
             return FALSE;
         } else {
             return TRUE;
+        }
+    }
+
+    public function updateStatus()
+    {
+        if(!in_array('updateRepairJob', $this->permission)) {
+            redirect('dashboard', 'refresh');
+        }
+
+        $id = $this->input->post('id');
+        $status = $this->input->post('status');
+
+        if($id && $status) {
+            $data = array(
+                'status' => $status,
+                'updated_at' => date('Y-m-d H:i:s')
+            );
+
+            $update = $this->model_repair_jobs->update($data, $id);
+            if($update == true) {
+                echo json_encode(array('success' => true));
+            } else {
+                echo json_encode(array('error' => 'Error occurred while updating status'));
+            }
+        } else {
+            echo json_encode(array('error' => 'Invalid request'));
         }
     }
 }

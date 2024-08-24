@@ -126,23 +126,44 @@
 <?php endif; ?>
 
 <style>
-  /* Positioning the DataTable buttons to the top-center */
-  div.dataTables_wrapper {
-    position: relative;
-  }
-  
-  div.dt-buttons {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  
-  /* Blue hover effect */
-  .dt-button:hover {
-    background-color: Red !important;
-    color: white !important; /* Text color */
-  }
+/* Positioning the DataTable buttons to the top-center */
+div.dataTables_wrapper {
+  position: relative;
+}
+
+div.dt-buttons {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Align the table header and tbody width */
+table.dataTable.no-footer {
+  width: 100%;
+}
+
+table.dataTable thead th,
+table.dataTable tbody td {
+  width: auto; /* Adjust the width as needed */
+}
+
+/* Blue hover effect */
+.dt-button:hover {
+  background-color: Red !important;
+  color: white !important; /* Text color */
+}
+.text-warning {
+    color: orange;
+}
+
+.text-danger {
+    color: red;
+}
+
+.text-success {
+    color: green;
+}
 </style>
 
 <script type="text/javascript">
@@ -176,11 +197,11 @@ $j(document).ready(function() {
         console.error('Error: Unable to retrieve repair job data.');
         return;
     }
-    var attributes = ['Ticket #','Customer Name', 'Customer Phone','Store', 'Item Name', 'Item IMEI', 'Price','Advance Payment','Remaining Payment', 'Due Date', 'Status',];
-    var printWindow = window.open('', '_blank');
-    printWindow.document.open();
+      var attributes = ['Ticket #','Customer Name', 'Customer Phone','Store', 'Item Name', 'Item IMEI', 'Price','Advance Payment','Remaining Payment', 'Due Date', 'Status',];
+      var printWindow = window.open('', '_blank');
+      printWindow.document.open();
 
-    printWindow.document.write('<html><head><title> Repair Job Details </title>');
+      printWindow.document.write('<html><head><title> Repair Job Details </title>');
       printWindow.document.write('<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">');
       printWindow.document.write('<style>@media print { body { margin: 0; font-family: Arial, sans-serif; } table { width: 100%; border-collapse: collapse; } th, td { border: 1px solid #000; padding: 8px; } @page { size: A4; margin: 0; } }</style>');
       printWindow.document.write('</head><body>');
@@ -213,7 +234,38 @@ $j(document).ready(function() {
       printWindow.document.write('</body></html>');
       printWindow.document.close();
       printWindow.print();
-        });
+  });
+
+// Add an event listener for the status dropdown menus
+$j('#manageTable').on('click', '.status-link', function() {
+  var id = $(this).data('id');
+  var status = $(this).data('status');
+
+  $.ajax({
+    url: base_url + 'repairJobs/updateStatus',
+    type: 'POST',
+    data: {
+      id: id,
+      status: status
+    },
+    success: function(response) {
+      // Parse the JSONP response
+    var parsedResponse = JSON.parse(response);
+      if(parsedResponse.success) {
+        // Refresh the table or update the status column visually
+        // You can use the returned repair job ID to find the corresponding row and update the status column
+        manageTable.ajax.reload(null, false);
+
+       
+      } else {
+        alert('Error occurred while updating status');
+      }
+    },
+    error: function() {
+      alert('An error occurred');
+    }
+  });
+});
 });
 
 // remove functions 
