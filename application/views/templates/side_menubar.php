@@ -111,6 +111,31 @@
               </ul>
             </li>
           <?php endif; ?>
+          <?php if(in_array('createProduct', $user_permission) || in_array('updateProduct', $user_permission) || in_array('viewProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
+            <li class="treeview" id="mainPartItemNav">
+              <a href="#">
+                <i class="fa fa-database"></i>
+                <span>Part Items</span>
+                <span class="pull-right-container">
+                  <i class="fa fa-angle-left pull-right"></i>
+                </span>
+              </a>
+              <ul class="treeview-menu">
+                <?php if(in_array('createProduct', $user_permission)): ?>
+                  <li id="addPartItemNav"><a href="<?php echo base_url('partItems/create') ?>"><i class="fa fa-circle-o"></i> Add Part Item</a></li>
+                <?php endif; ?>
+                <?php if(in_array('updateProduct', $user_permission) || in_array('viewProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
+                <li id="managePartItemNav"><a href="<?php echo base_url('partItems') ?>"><i class="fa fa-circle-o"></i> Manage Part Items</a></li>
+                <?php endif; ?>
+                <?php if(in_array('viewProduct', $user_permission) && !$this->session->userdata('is_admin')): ?>
+                  <li id="otherStoresProductNav"><a href="<?php echo base_url('products/other_stores') ?>"><i class="fa fa-circle-o"></i> Other Stores Part Items</a></li>
+                <?php endif; ?>
+                <?php if(in_array('viewProduct', $user_permission)): ?>
+                  <li id="soldProductNav"><a href="<?php echo base_url('products/sold_products') ?>"><i class="fa fa-circle-o"></i> Sold Part Items</a></li>
+                <?php endif; ?>
+              </ul>
+            </li>
+          <?php endif; ?>
 
 
           <?php if(in_array('createOrder', $user_permission) || in_array('updateOrder', $user_permission) || in_array('viewOrder', $user_permission) || in_array('deleteOrder', $user_permission)): ?>
