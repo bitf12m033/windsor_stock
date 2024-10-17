@@ -8,11 +8,11 @@
   <section class="content-header">
     <h1>
       Other Stores
-      <small>Products</small>
+      <small>Part Items</small>
     </h1>
     <ol class="breadcrumb">
       <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active">Other Stores Products</li>
+      <li class="active">Other Stores Part Items</li>
     </ol>
   </section>
 
@@ -25,7 +25,7 @@
         <div id="messages"></div>
         <div class="box">
           <div class="box-header">
-            <h3 class="box-title">Search Products</h3>
+            <h3 class="box-title">Search Part Items</h3>
           </div>
           <div class="box-body">
             <form id="searchForm">
@@ -54,10 +54,10 @@
                 <th>IMEI</th>
                 <th>Product Name</th>
                 <th>Price</th>
-                <th>Qty</th>
+                <th>Quantity</th>
                 <th>Store</th>
                 <th>Availability</th>
-                <th>Properties</th>
+                <!-- <th>Properties</th> -->
                 <!-- <?php if(in_array('updateProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
                   <th>Action</th>
                 <?php endif; ?> -->
@@ -84,12 +84,12 @@ var manageTable;
 var base_url = "<?php echo base_url(); ?>";
 
 $j(document).ready(function() {
-  $j("#mainProductNav").addClass('active');
-  $j("#otherStoresProductNav").addClass('active');
+  $j("#mainPartItemNav").addClass('active');
+  $j("#otherStoresPartItemNav").addClass('active');
 
   // Initialize the DataTable
   manageTable = $('#manageTable').DataTable({
-    'ajax': base_url + 'products/fetchOtherStoresProductData',
+    'ajax': base_url + 'partItems/fetchOtherStoresProductData',
     'order': [],
   });
 

@@ -76,7 +76,7 @@
 
                 <div class="form-group">
                   <label for="quantity">Quantity</label>
-                  <input type="text" class="form-control" id="quantity" name="qty" placeholder="Enter quantity" value="<?php echo $product_data['quantity']; ?>" autocomplete="off" />
+                  <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Enter quantity" value="<?php echo $product_data['quantity']; ?>" autocomplete="off" />
                 </div>
 
                 <div class="form-group">

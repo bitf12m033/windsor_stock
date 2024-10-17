@@ -74,7 +74,7 @@
                 <th>Qty</th>
                 <th>Store</th>
                 <th>Availability</th>
-                <th>Properties</th>
+                <!-- <th>Properties</th> -->
                 <?php if(in_array('updateProduct', $user_permission) || in_array('viewMarkSold', $user_permission)  || in_array('deleteProduct', $user_permission)): ?>
                   <!-- <th>Status</th> -->
                   <th>Action</th>
@@ -106,10 +106,10 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Remove Product</h4>
+        <h4 class="modal-title">Remove Part Item</h4>
       </div>
 
-      <form role="form" action="<?php echo base_url('products/remove') ?>" method="post" id="removeForm">
+      <form role="form" action="<?php echo base_url('partItems/remove') ?>" method="post" id="removeForm">
         <div class="modal-body">
           <p>Do you really want to remove?</p>
         </div>
@@ -153,7 +153,7 @@ $j(document).ready(function() {
   $j("#managePartItemNav").addClass('active');
 
   // Initialize the DataTable
-    manageTable = $('#manageTable').DataTable({
+  manageTable = $('#manageTable').DataTable({
     dom: 'lBfrtip', // Include length menu and buttons
     buttons: [
         {
@@ -200,29 +200,29 @@ $j(document).ready(function() {
                 });
 
                 var now = new Date();
-var options = { timeZone: 'Europe/London', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-var dateTime = now.toLocaleString('en-GB', options);
-doc['footer'] = (function(page, pages) {
-    return {
-        columns: [
-            {
-                alignment: 'left',
-                text: 'Generated on: ' + dateTime,
-                margin: [10, 0]
-            },
-            {
-                alignment: 'right',
-                text: [
-                    { text: page.toString(), italics: true },
-                    ' of ',
-                    { text: pages.toString(), italics: true }
-                ],
-                margin: [0, 0, 10, 0]
-            }
-        ],
-        margin: [10, 0]
-    };
-});
+                var options = { timeZone: 'Europe/London', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                var dateTime = now.toLocaleString('en-GB', options);
+                doc['footer'] = (function(page, pages) {
+                    return {
+                        columns: [
+                            {
+                                alignment: 'left',
+                                text: 'Generated on: ' + dateTime,
+                                margin: [10, 0]
+                            },
+                            {
+                                alignment: 'right',
+                                text: [
+                                    { text: page.toString(), italics: true },
+                                    ' of ',
+                                    { text: pages.toString(), italics: true }
+                                ],
+                                margin: [0, 0, 10, 0]
+                            }
+                        ],
+                        margin: [10, 0]
+                    };
+                });
             }
         }
     ],
@@ -237,7 +237,39 @@ doc['footer'] = (function(page, pages) {
             data: null,
             defaultContent: '<button class="btn btn-primary print-btn">PDF</button>'
         }
-    ]
+        ,
+        {
+            targets: -2,
+            data: null,
+            defaultContent: '<div class="barcode-container"></div>'
+        }
+    ],
+    drawCallback: function (settings) {
+      // Generate and display barcode images
+      var api = this.api();
+      api.rows({ page: 'current' }).nodes().each(function (row, index) {
+          var data = api.row(index).data();
+          var barcodeContainer = $(row).find('.barcode-container');
+          JsBarcode(barcodeContainer, data.sku, {
+            format: "CODE128",
+            displayValue: true,
+            fontSize: 16,
+            margin: 0,
+            width: 2,
+            height: 50
+          });
+          // JsBarcode.init();
+          // JsBarcode.encode(data.product_id, barcodeContainer, {
+          //     format: 'CODE128',
+          //     width: 1,
+          //     height: 30,
+          //     margin: 0,
+          //     displayValue: true,
+          //     fontSize: 12,
+          //     textPosition: 'bottom'
+          // });
+      });
+  }
 });
 
 
@@ -249,6 +281,8 @@ doc['footer'] = (function(page, pages) {
             console.error('Error: Unable to retrieve product data.');
             return;
         }
+
+       
         var attributes = ['Image', 'IMEI', 'Product Name', 'Price', 'Qty', 'Store', 'Availability','Properties'];
         var printWindow = window.open('', '_blank');
         printWindow.document.open();
@@ -302,7 +336,7 @@ function removeFunc(id)
       $.ajax({
         url: form.attr('action'),
         type: form.attr('method'),
-        data: { product_id:id }, 
+        data: { id:id }, 
         dataType: 'json',
         success:function(response) {
 

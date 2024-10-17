@@ -128,10 +128,10 @@
                 <li id="managePartItemNav"><a href="<?php echo base_url('partItems') ?>"><i class="fa fa-circle-o"></i> Manage Part Items</a></li>
                 <?php endif; ?>
                 <?php if(in_array('viewProduct', $user_permission) && !$this->session->userdata('is_admin')): ?>
-                  <li id="otherStoresProductNav"><a href="<?php echo base_url('products/other_stores') ?>"><i class="fa fa-circle-o"></i> Other Stores Part Items</a></li>
+                  <li id="otherStoresPartItemNav"><a href="<?php echo base_url('partItems/other_stores') ?>"><i class="fa fa-circle-o"></i> Other Stores Part Items</a></li>
                 <?php endif; ?>
                 <?php if(in_array('viewProduct', $user_permission)): ?>
-                  <li id="soldProductNav"><a href="<?php echo base_url('products/sold_products') ?>"><i class="fa fa-circle-o"></i> Sold Part Items</a></li>
+                  <li id="soldPartItemNav"><a href="<?php echo base_url('partItems/sold_products') ?>"><i class="fa fa-circle-o"></i> Sold Part Items</a></li>
                 <?php endif; ?>
               </ul>
             </li>

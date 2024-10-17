@@ -82,12 +82,12 @@ class Model_part_items extends CI_Model
 	public function getProductDataByStore($store_id, $search = null)
 	{
 		$this->db->select('*');
-		$this->db->from('product_attributes_view');
+		$this->db->from('part_items');
 		$this->db->where('store_id', $store_id);
-		$this->db->where('availability', 1);
+		// $this->db->where('availability', 1);
 		if ($search) {
 			$this->db->group_start();
-			$this->db->like('name', $search);
+			$this->db->like('title', $search);
 			$this->db->or_like('sku', $search);
 			$this->db->or_like('description', $search);
 			$this->db->group_end();
@@ -101,15 +101,15 @@ class Model_part_items extends CI_Model
 	public function getProductDataFromOtherStores($store_id, $search = null)
 	{
 		$this->db->select('*');
-		$this->db->from('product_attributes_view');
+		$this->db->from('part_items');
 		$this->db->where('store_id !=', $store_id);
-		$this->db->where('availability', 1);
+		// $this->db->where('availability', 1);
 		if ($search) {
 			$this->db->group_start();
-			$this->db->like('name', $search);
+			$this->db->like('title', $search);
 			$this->db->or_like('sku', $search);
 			$this->db->or_like('description', $search);
-			$this->db->or_like('attributes', $search);
+			// $this->db->or_like('attributes', $search);
 			$this->db->group_end();
 		}
 	
@@ -129,10 +129,8 @@ class Model_part_items extends CI_Model
 	{
 		if($data && $id) {
 			$this->db->where('id', $id);
-			$update = $this->db->update('products', $data);
-			if ($update) {
-				$this->updateProductAttributesView();
-			}
+			$update = $this->db->update('part_items', $data);
+			
 			return ($update == true) ? true : false;
 		}
 	}
@@ -141,30 +139,27 @@ class Model_part_items extends CI_Model
 	{
 		if($id) {
 			$this->db->where('id', $id);
-			$delete = $this->db->delete('products');
-			if ($delete) {
-				$this->updateProductAttributesView();
-			}
+			$delete = $this->db->delete('part_items');
 			return ($delete == true) ? true : false;
 		}
 	}
 
 	public function countTotalProducts()
 	{
-		$sql = "SELECT * FROM `products`";
+		$sql = "SELECT * FROM `part_items`";
 		$query = $this->db->query($sql);
 		return $query->num_rows();
 	}
 	public function countTotalProductsByStore($store_id)
 	{
 		$this->db->where('store_id', $store_id);
-		$this->db->from('products');
+		$this->db->from('part_items');
 		return $this->db->count_all_results();
 	}
 
 	public function getSoldProductData($search = null)
 	{
-		$this->db->where('availability', 0);
+		// $this->db->where('availability', 0);
     	$this->db->where('sold_date IS NOT NULL');
 		if ($search) {
 			$this->db->group_start();
