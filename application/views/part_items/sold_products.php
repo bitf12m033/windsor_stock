@@ -58,7 +58,6 @@
                   <th>Qty</th>
                   <th>Store</th>
                   <th>Availability</th>
-                  <th>Properties</th>
                   <th>Sold Date</th>
                   <?php if (in_array('updateProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
                     <?php if ($this->session->userdata('is_admin')) : ?>

@@ -159,19 +159,18 @@ class Model_part_items extends CI_Model
 
 	public function getSoldProductData($search = null)
 	{
-		// $this->db->where('availability', 0);
-    	$this->db->where('sold_date IS NOT NULL');
+		$this->db->where('quantity', 0);
+    	// $this->db->where('sold_date IS NOT NULL');
 		if ($search) {
 			$this->db->group_start();
-			$this->db->like('name', $search);
+			$this->db->like('title', $search);
 			$this->db->or_like('sku', $search);
 			$this->db->or_like('description', $search);
-			$this->db->or_like('attributes', $search);
 			$this->db->group_end();
 		}
 		
-		$this->db->order_by('sold_date', 'DESC');
-		$query = $this->db->get('product_attributes_view');
+		// $this->db->order_by('sold_date', 'DESC');
+		$query = $this->db->get('part_items');
 		return $query->result_array();
 	}
 

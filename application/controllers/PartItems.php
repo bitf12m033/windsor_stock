@@ -458,54 +458,32 @@ class PartItems extends Admin_Controller
                 $buttons .= ' <button type="button" class="btn btn-warning" onclick="markForSale('.$value['id'].')"><i class="fa fa-undo"></i> Mark for Sale</button>';
             }
 
-            $img = '<img src="'.base_url($value['image']).'" alt="'.$value['name'].'" class="img-circle" width="50" height="50" />';
+            $img = '<img src="'.base_url($value['image']).'" alt="'.$value['title'].'" class="img-circle" width="50" height="50" />';
 
-            $availability = ($value['availability'] == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
+            $availability = ($value['quantity'] >= 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
 
             $qty_status = '';
-            if($value['qty'] < 5) {
+            if($value['quantity'] < 5) {
                 $qty_status = '<span class="label label-warning">Low !</span>';
-            } else if($value['qty'] <= 0) {
+            } else if($value['quantity'] <= 0) {
                 $qty_status = '<span class="label label-danger">Out of stock !</span>';
             }
 
-            $availability = ($value['availability'] == 0) ? '<span class="label label-danger">Sold</span>' : '<span class="label label-success">Available</span>';
-            $attribute_values = '';
-            if (!empty($value['attributes'])) {
-                $attributes = json_decode($value['attributes'], true);
-                $unique_attributes = [];
-
-                foreach ($attributes as $attr) {
-                    $attr_name = $attr['attribute_name'];
-                    $attr_value = $attr['attribute_value'];
-
-                    if (!isset($unique_attributes[$attr_name])) {
-                        $unique_attributes[$attr_name] = [];
-                    }
-
-                    if (!in_array($attr_value, $unique_attributes[$attr_name])) {
-                        $unique_attributes[$attr_name][] = $attr_value;
-                    }
-                }
-
-                $attribute_values = implode(', ', array_map(function($attr_name) use ($unique_attributes) {
-                    return $attr_name . ': ' . implode(', ', $unique_attributes[$attr_name]);
-                }, array_keys($unique_attributes)));
-            }
+            $availability = ($value['quantity'] == 0) ? '<span class="label label-danger">Sold</span>' : '<span class="label label-success">Available</span>';
+           
              // Convert UTC to PKT and format the date
-            $utc_date = new DateTime($value['sold_date'], new DateTimeZone('UTC'));
+            $utc_date = new DateTime($value['created_at'], new DateTimeZone('UTC'));
             $utc_date->setTimezone(new DateTimeZone('Europe/London'));
             $formatted_sold_date = $utc_date->format('l, Y-m-d h:i A');
 
             $result['data'][$key] = array(
                 $img,
                 $value['sku'],
-                $value['name'],
+                $value['title'],
                 $value['price'],
-                $value['qty'] . ' ' . $qty_status,
+                $value['quantity'] . ' ' . $qty_status,
                 $store_data['name'],
                 $availability,
-                $attribute_values, // Include attributes
                 $formatted_sold_date,
                 $buttons
             );
