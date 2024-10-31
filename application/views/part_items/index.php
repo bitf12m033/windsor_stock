@@ -70,13 +70,14 @@
                 <th>Image</th>
                 <th>IMEI</th>
                 <th>Product Name</th>
-                <th>Price</th>
-                <th>Qty</th>
+                <th>Cost Price</th>
+                <th>Sell Price</th>
+                <th>Quantity</th>
                 <th>Store</th>
                 <th>Availability</th>
-                <!-- <th>Properties</th> -->
+  
                 <?php if(in_array('updateProduct', $user_permission) || in_array('viewMarkSold', $user_permission)  || in_array('deleteProduct', $user_permission)): ?>
-                  <!-- <th>Status</th> -->
+        
                   <th>Action</th>
                   <th>Print</th>
                   
@@ -237,12 +238,7 @@ $j(document).ready(function() {
             data: null,
             defaultContent: '<button class="btn btn-primary print-btn">PDF</button>'
         }
-        ,
-        {
-            targets: -2,
-            data: null,
-            defaultContent: '<div class="barcode-container"></div>'
-        }
+       
     ],
     drawCallback: function (settings) {
       // Generate and display barcode images

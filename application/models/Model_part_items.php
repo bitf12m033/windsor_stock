@@ -6,42 +6,7 @@ class Model_part_items extends CI_Model
 	{
 		parent::__construct();
 	}
-	private function updateProductAttributesView()
-    {
-        $sql = "
-        CREATE OR REPLACE VIEW product_attributes_view AS
-        SELECT 
-            p.id,
-            p.name,
-            p.sku,
-            p.price,
-            p.qty,
-            p.image,
-            p.description,
-            p.store_id,
-            p.availability,
-            p.sold_date,
-            p.created_at,
-            (
-                SELECT 
-                    JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'attribute_name', a.name,
-                            'attribute_value', av.value
-                        )
-                    )
-                FROM 
-                    attribute_value av
-                JOIN 
-                    attributes a ON a.id = av.attribute_parent_id
-                WHERE 
-                    JSON_CONTAINS(p.attribute_value_id, CAST(av.id AS JSON), '$')
-            ) AS attributes
-        FROM 
-            products p;
-        ";
-        $this->db->query($sql);
-    }
+
 	/* get the brand data */
 
 	public function getProductDataById($id = null)
@@ -60,7 +25,9 @@ class Model_part_items extends CI_Model
 			$query = $this->db->get('part_items');
 			return $query->row_array();
 		}
-
+		
+		$this->db->where('is_active', 1);
+		$this->db->where('is_deleted', 0);
 		if ($search) {
 			$this->db->group_start();
 			$this->db->like('title', $search);
@@ -74,7 +41,7 @@ class Model_part_items extends CI_Model
 
 	public function getActiveProductData()
 	{
-		$sql = "SELECT * FROM `products` WHERE availability = ? ORDER BY id DESC";
+		$sql = "SELECT * FROM `part_items` WHERE is_active = ? ORDER BY id DESC";
 		$query = $this->db->query($sql, array(1));
 		return $query->result_array();
 	}
@@ -84,7 +51,8 @@ class Model_part_items extends CI_Model
 		$this->db->select('*');
 		$this->db->from('part_items');
 		$this->db->where('store_id', $store_id);
-		// $this->db->where('availability', 1);
+		$this->db->where('is_active', 1);
+		$this->db->where('is_deleted', 0);
 		if ($search) {
 			$this->db->group_start();
 			$this->db->like('title', $search);
@@ -103,13 +71,14 @@ class Model_part_items extends CI_Model
 		$this->db->select('*');
 		$this->db->from('part_items');
 		$this->db->where('store_id !=', $store_id);
-		// $this->db->where('availability', 1);
+		$this->db->where('is_active', 1);
+		$this->db->where('is_deleted', 0);
 		if ($search) {
 			$this->db->group_start();
 			$this->db->like('title', $search);
 			$this->db->or_like('sku', $search);
 			$this->db->or_like('description', $search);
-			// $this->db->or_like('attributes', $search);
+		
 			$this->db->group_end();
 		}
 	
@@ -134,8 +103,21 @@ class Model_part_items extends CI_Model
 			return ($update == true) ? true : false;
 		}
 	}
-
+	
 	public function remove($id)
+	{
+		if($id) {
+			$data = array(
+				'deleted_at' => date('Y-m-d H:i:s'),
+				'is_deleted' => 1,
+				'is_active' => 0
+			);
+			$this->db->where('id', $id);
+			$update = $this->db->update('part_items', $data);
+			return ($update == true) ? true : false;
+		}
+	}
+	public function hard_remove($id)
 	{
 		if($id) {
 			$this->db->where('id', $id);
@@ -160,7 +142,8 @@ class Model_part_items extends CI_Model
 	public function getSoldProductData($search = null)
 	{
 		$this->db->where('quantity', 0);
-    	// $this->db->where('sold_date IS NOT NULL');
+		$this->db->where('is_active', 1);
+		$this->db->where('is_deleted', 0);
 		if ($search) {
 			$this->db->group_start();
 			$this->db->like('title', $search);
@@ -178,18 +161,24 @@ class Model_part_items extends CI_Model
 	{
 		
 		$this->db->where('store_id', $store_id);
-		$this->db->where('availability', 0);
+		$this->db->where('quantity', 0);
 		if ($search) {
 			$this->db->group_start();
-			$this->db->like('name', $search);
+			$this->db->like('title', $search);
 			$this->db->or_like('sku', $search);
-			$this->db->or_like('attributes', $search);
 			$this->db->group_end();
 		}
 		
-		$this->db->order_by('sold_date', 'DESC');
-		$query = $this->db->get('product_attributes_view');
+		// $this->db->order_by('sold_date', 'DESC');
+		$query = $this->db->get('part_items');
 		return $query->result_array();
 
+	}
+
+	public function check_sku_unique($sku)
+	{
+		$this->db->where('sku', $sku);
+		$query = $this->db->get('part_items');
+		return $query->num_rows() === 0;
 	}
 }

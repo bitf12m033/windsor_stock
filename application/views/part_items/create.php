@@ -43,8 +43,12 @@
           <form role="form" action="<?php base_url('users/create') ?>" method="post" enctype="multipart/form-data">
               <div class="box-body">
 
-                <?php echo validation_errors(); ?>
-
+              <?php if(validation_errors()): ?>
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  <?php echo validation_errors(); ?>
+                </div>
+              <?php endif; ?>
                 <div class="form-group">
 
                   <label for="product_image">Image</label>
@@ -62,13 +66,22 @@
 
                 <div class="form-group">
                   <label for="sku">IMEI</label>
-                  <input type="text" class="form-control" id="sku" name="sku" placeholder="Enter IMEI" autocomplete="off" />
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="sku" name="sku" placeholder="Enter IMEI" autocomplete="off" />
+                    <span class="input-group-addon" id="generate-sku">
+                      <i class="fa fa-refresh" aria-hidden="true"></i>
+                    </span>
+                  </div>
                   <svg id="barcode"></svg>
                 </div>
 
                 <div class="form-group">
-                  <label for="price">Price</label>
-                  <input type="text" class="form-control" id="price" name="price" placeholder="Enter price" autocomplete="off" />
+                  <label for="cost_price">Cost Price</label>
+                  <input type="text" class="form-control" id="cost_price" name="cost_price" placeholder="Enter cost price" autocomplete="off" />
+                </div>
+                <div class="form-group">
+                  <label for="sell_price">Sell Price</label>
+                  <input type="text" class="form-control" id="sell_price" name="sell_price" placeholder="Enter sell  price" autocomplete="off" />
                 </div>
 
                 <div class="form-group">
@@ -83,25 +96,6 @@
                   </textarea>
                 </div>
 
-                
-                <!-- <div class="form-group">
-                  <label for="brands">Brands</label>
-                  <select class="form-control select_group" id="brands" name="brands[]" multiple="multiple">
-                    <?php foreach ($brands as $k => $v): ?>
-                      <option value="<?php echo $v['id'] ?>"><?php echo $v['name'] ?></option>
-                    <?php endforeach ?>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label for="category">Category</label>
-                  <select class="form-control select_group" id="category" name="category[]" multiple="multiple">
-                    <?php foreach ($category as $k => $v): ?>
-                      <option value="<?php echo $v['id'] ?>"><?php echo $v['name'] ?></option>
-                    <?php endforeach ?>
-                  </select>
-                </div> -->
-                
                 <?php if($this->session->userdata('is_admin')): ?>
                   <div class="form-group">
                     <label for="store">Store</label>
@@ -117,7 +111,7 @@
                   <label for="store">Availability</label>
                   <select class="form-control" id="availability" name="availability">
                     <option value="1">Yes</option>
-                    <option value="2">No</option>
+                    <option value="0">No</option>
                   </select>
                 </div>
 
@@ -145,6 +139,23 @@
 
 <script type="text/javascript">
   $(document).ready(function() {
+
+    // Function to generate random SKU
+    function generateRandomSKU() {
+      var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      var sku = '';
+      for (var i = 0; i < 6; i++) {
+        sku += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return sku;
+    }
+    
+    // Handle click on refresh icon
+    $("#generate-sku").on("click", function() {
+      var randomSKU = generateRandomSKU();
+      $("#sku").val(randomSKU).trigger("input");
+    });
+    
     $("#mainPartItemNav").addClass('active');
     $("#addPartItemNav").addClass('active');
 
@@ -160,6 +171,25 @@
         margin: 0,
         width: 2,
         height: 50
+      });
+
+      // Check SKU uniqueness
+      $.ajax({
+        url: '<?php echo base_url("partItems/check_sku_unique"); ?>',
+        method: 'POST',
+        data: { sku: value },
+        dataType: 'json',
+        success: function(response) {
+          if (!response.is_unique) {
+            $("#sku-error").remove();
+            $("#sku").after('<div id="sku-error" class="text-danger">This IMEI is already in use. Please enter a unique IMEI.</div>');
+          } else {
+            $("#sku-error").remove();
+          }
+        },
+        error: function() {
+          console.error('Error checking SKU uniqueness');
+        }
       });
     });
     // JsBarcode("#barcode", "123456789012", {

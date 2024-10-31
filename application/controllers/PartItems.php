@@ -62,7 +62,7 @@ class PartItems extends Admin_Controller
             }
             
             // Add button to mark as sold
-            if(true || in_array('viewMarkSold', $this->permission) && $value['availability'] == 1) {
+            if(in_array('viewMarkSold', $this->permission) && $value['is_active'] == 1) {
                 $buttons .= ' <button type="button" class="btn btn-default" onclick="markAsSold('.$value['id'].')"><i class="fa fa-check"></i> Mark as Sold</button>';
             }
 
@@ -76,40 +76,18 @@ class PartItems extends Admin_Controller
                 $qty_status = '<span class="label label-danger">Out of stock !</span>';
             }
             
-            // $availability = ($value['availability'] == 1) ? '<span class="label label-success">Available</span>' : '<span class="label label-danger">Sold</span>';
+            $availability = ($value['is_active'] == 1) ? '<span class="label label-success">Available</span>' : '<span class="label label-danger">Inactive</span>';
 
-            $attribute_values = '';
-            $availability = '';
-            // if (!empty($value['attributes'])) {
-            //     $attributes = json_decode($value['attributes'], true);
-            //     $unique_attributes = [];
 
-            //     foreach ($attributes as $attr) {
-            //         $attr_name = $attr['attribute_name'];
-            //         $attr_value = $attr['attribute_value'];
-
-            //         if (!isset($unique_attributes[$attr_name])) {
-            //             $unique_attributes[$attr_name] = [];
-            //         }
-
-            //         if (!in_array($attr_value, $unique_attributes[$attr_name])) {
-            //             $unique_attributes[$attr_name][] = $attr_value;
-            //         }
-            //     }
-
-            //     $attribute_values = implode(', ', array_map(function($attr_name) use ($unique_attributes) {
-            //         return $attr_name . ': ' . implode(', ', $unique_attributes[$attr_name]);
-            //     }, array_keys($unique_attributes)));
-            // }
             $result['data'][$key] = array(
                 $img,
                 $value['sku'],
                 $value['title'],
-                $value['price'],
+                $value['cost_price'],
+                $value['sell_price'],
                 $value['quantity'] . ' ' . $qty_status,
                 $store_data['name'],
                 $availability,
-                $attribute_values, // Include attributes
                 $buttons
             );
         } // /foreach
@@ -128,10 +106,10 @@ class PartItems extends Admin_Controller
             redirect('dashboard', 'refresh');
         }
 
-		$this->form_validation->set_rules('title', 'Part Item name', 'trim|required');
-		$this->form_validation->set_rules('sku', 'SKU', '');
-		$this->form_validation->set_rules('price', 'Price', '');
-		$this->form_validation->set_rules('quantity', 'Quantity', 'trim|required');
+        $this->form_validation->set_rules('title', 'Part Item name', 'trim|required');
+        $this->form_validation->set_rules('sku', 'SKU', '');
+        $this->form_validation->set_rules('cost_price', 'Cost Price', 'trim|required|numeric|greater_than_equal_to[0]');
+        $this->form_validation->set_rules('sell_price', 'Sell Price', 'trim|required|numeric|greater_than_equal_to[0]|callback_check_sell_price');        $this->form_validation->set_rules('quantity', 'Quantity', 'trim|required');
 
         if($this->session->userdata('is_admin')) {
             $this->form_validation->set_rules('store', 'Store', 'trim|required');
@@ -142,7 +120,7 @@ class PartItems extends Admin_Controller
             $store_id = $this->session->userdata('store_id');
         }
 
-		$this->form_validation->set_rules('availability', 'Availability', 'trim|required');
+		
 		
         if ($this->form_validation->run() == TRUE) {
             // true case
@@ -151,8 +129,10 @@ class PartItems extends Admin_Controller
         	$data = array(
         		'title' => $this->input->post('title'),
         		'sku' => $this->input->post('sku'),
-        		'price' => $this->input->post('price'),
+        		'cost_price' => $this->input->post('cost_price'),
+        		'sell_price' => $this->input->post('sell_price'),
         		'quantity' => $this->input->post('quantity'),
+        		'is_active' => $this->input->post('availability'),
         		'image' => $upload_image,
         		'description' => $this->input->post('description'),
         		'store_id' => $store_id
@@ -172,19 +152,6 @@ class PartItems extends Admin_Controller
         else {
            
 
-        	// attributes 
-        	$attribute_data = $this->model_attributes->getActiveAttributeData();
-
-        	$attributes_final_data = array();
-        	foreach ($attribute_data as $k => $v) {
-        		$attributes_final_data[$k]['attribute_data'] = $v;
-
-        		$value = $this->model_attributes->getAttributeValueData($v['id']);
-
-        		$attributes_final_data[$k]['attribute_value'] = $value;
-        	}
-
-        	$this->data['attributes'] = $attributes_final_data;
 			$this->data['brands'] = $this->model_brands->getActiveBrands();        	
 			$this->data['category'] = $this->model_category->getActiveCategroy();        	
 			$this->data['stores'] = $this->model_stores->getActiveStore();        	
@@ -242,9 +209,9 @@ class PartItems extends Admin_Controller
 
         $this->form_validation->set_rules('title', 'Part Item name', 'trim|required');
 		$this->form_validation->set_rules('sku', 'SKU', '');
-		$this->form_validation->set_rules('price', 'Price', '');
+		$this->form_validation->set_rules('cost_price', 'cost_price', '');
 		$this->form_validation->set_rules('quantity', 'Quantity', 'trim|required');
-
+        $this->form_validation->set_rules('availability', 'Availability', 'trim|required');
         if ($this->form_validation->run() == TRUE) {
             // true case
             if($this->session->userdata('is_admin')) {
@@ -268,8 +235,9 @@ class PartItems extends Admin_Controller
             $data = array(
                 'title' => $this->input->post('title'),
         		'sku' => $this->input->post('sku'),
-        		'price' => $this->input->post('price'),
+        		'cost_price' => $this->input->post('cost_price'),
         		'quantity' => $this->input->post('quantity'),
+                'is_active' => $this->input->post('availability'),
         		'description' => $this->input->post('description'),
         		'store_id' => $store_id,
             );
@@ -305,7 +273,7 @@ class PartItems extends Admin_Controller
             redirect('dashboard', 'refresh');
         }
         
-        $product_id = $this->input->post('id');
+        $id = $this->input->post('id');
 
         $response = array();
         if($id) {
@@ -369,7 +337,7 @@ class PartItems extends Admin_Controller
 
             $img = '<img src="'.base_url($value['image']).'" alt="'.$value['title'].'" class="img-circle" width="50" height="50" />';
 
-            $availability = ($value['quantity'] > 0) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Sold</span>';
+            $availability = ($value['is_active'] == 11) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
 
             $qty_status = '';
             if($value['quantity'] < 5) {
@@ -383,7 +351,8 @@ class PartItems extends Admin_Controller
                 $img,
                 $value['sku'],
                 $value['title'],
-                $value['price'],
+                $value['cost_price'],
+                $value['sell_price'],
                 $value['quantity'] . ' ' . $qty_status,
                 $store_data['name'],
                 $availability,
@@ -460,7 +429,7 @@ class PartItems extends Admin_Controller
 
             $img = '<img src="'.base_url($value['image']).'" alt="'.$value['title'].'" class="img-circle" width="50" height="50" />';
 
-            $availability = ($value['quantity'] >= 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
+            $availability = ($value['is_active'] == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
 
             $qty_status = '';
             if($value['quantity'] < 5) {
@@ -469,7 +438,6 @@ class PartItems extends Admin_Controller
                 $qty_status = '<span class="label label-danger">Out of stock !</span>';
             }
 
-            $availability = ($value['quantity'] == 0) ? '<span class="label label-danger">Sold</span>' : '<span class="label label-success">Available</span>';
            
              // Convert UTC to PKT and format the date
             $utc_date = new DateTime($value['created_at'], new DateTimeZone('UTC'));
@@ -480,7 +448,8 @@ class PartItems extends Admin_Controller
                 $img,
                 $value['sku'],
                 $value['title'],
-                $value['price'],
+                $value['cost_price'],
+                $value['sell_price'],
                 $value['quantity'] . ' ' . $qty_status,
                 $store_data['name'],
                 $availability,
@@ -515,5 +484,22 @@ class PartItems extends Admin_Controller
         }
 
         echo json_encode($response);
+    }
+    public function check_sku_unique()
+    {
+        $sku = $this->input->post('sku');
+        $is_unique = $this->model_part_items->check_sku_unique($sku);
+
+        echo json_encode(['is_unique' => $is_unique]);
+    }
+
+    public function check_sell_price($sell_price)
+    {
+        $cost_price = $this->input->post('cost_price');
+        if ($sell_price < $cost_price) {
+            $this->form_validation->set_message('check_sell_price', 'The Sell Price must be greater than or equal to the Cost Price.');
+            return FALSE;
+        }
+        return TRUE;
     }
 }

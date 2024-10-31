@@ -54,8 +54,9 @@
                   <th>Image</th>
                   <th>IMEI</th>
                   <th>Product Name</th>
-                  <th>Price</th>
-                  <th>Qty</th>
+                  <th>Cost Price</th>
+                  <th>Sell Price</th>
+                  <th>Quantity</th>
                   <th>Store</th>
                   <th>Availability</th>
                   <th>Sold Date</th>

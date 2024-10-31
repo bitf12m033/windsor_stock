@@ -53,11 +53,11 @@
                 <th>Image</th>
                 <th>IMEI</th>
                 <th>Product Name</th>
-                <th>Price</th>
+                <th>Cost Price</th>
+                <th>Sell Price</th>
                 <th>Quantity</th>
                 <th>Store</th>
                 <th>Availability</th>
-                <!-- <th>Properties</th> -->
                 <!-- <?php if(in_array('updateProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
                   <th>Action</th>
                 <?php endif; ?> -->

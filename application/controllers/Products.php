@@ -108,7 +108,7 @@ class Products extends Admin_Controller
                 $value['qty'] . ' ' . $qty_status,
                 $store_data['name'],
                 $availability,
-                // $attribute_values, // Include attributes
+                $attribute_values, // Include attributes
                 $buttons
             );
         } // /foreach
