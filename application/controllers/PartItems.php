@@ -61,9 +61,14 @@ class PartItems extends Admin_Controller
                 $buttons .= ' <button type="button" class="btn btn-default" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>';
             }
             
-            // Add button to mark as sold
-            if(in_array('viewMarkSold', $this->permission) && $value['is_active'] == 1) {
-                $buttons .= ' <button type="button" class="btn btn-default" onclick="markAsSold('.$value['id'].')"><i class="fa fa-check"></i> Mark as Sold</button>';
+            // // Add button to mark as sold
+            // if(in_array('viewMarkSold', $this->permission) && $value['is_active'] == 1) {
+            //     $buttons .= ' <button type="button" class="btn btn-default" onclick="markAsSold('.$value['id'].')"><i class="fa fa-check"></i> Mark as Sold</button>';
+            // }
+
+            // Add button to decrease quantity
+            if(in_array('updateProduct', $this->permission) && $value['quantity'] > 0) {
+                $buttons .= ' <button type="button" class="btn btn-default" onclick="decreaseQuantity('.$value['id'].')"><i class="fa fa-minus"></i> Decrease Qty</button>';
             }
 
             $img = '<img src="'.base_url($value['image']).'" alt="'.$value['title'].'" class="img-circle" width="50" height="50" />';
@@ -501,5 +506,30 @@ class PartItems extends Admin_Controller
             return FALSE;
         }
         return TRUE;
+    }
+
+    public function decreaseQuantity()
+    {
+        $product_id = $this->input->post('product_id');
+        $product = $this->model_part_items->getProductData($product_id);
+
+        if($product['quantity'] > 0) {
+            $data = array(
+                'quantity' => $product['quantity'] - 1
+            );
+            $update = $this->model_part_items->update($data, $product_id);
+            if($update) {
+                $response['success'] = true;
+                $response['messages'] = 'Quantity decreased successfully';
+            } else {
+                $response['success'] = false;
+                $response['messages'] = 'Error in the database while decreasing the product quantity';
+            }
+        } else {
+            $response['success'] = false;
+            $response['messages'] = 'Product quantity is already 0';
+        }
+
+        echo json_encode($response);
     }
 }
