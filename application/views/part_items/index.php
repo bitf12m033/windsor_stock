@@ -362,42 +362,15 @@ function removeFunc(id)
   }
 }
 
-function markAsSold(product_id) {
-    if(product_id) {
-        $.ajax({
-            url: 'products/markAsSold',
-            type: 'post',
-            data: {product_id: product_id},
-            dataType: 'json',
-            success:function(response) {
-                if(response.success === true) {
-                    // reload the manage table 
-                    manageTable.ajax.reload(null, false);
-                    // display success messages
-                    $('#messages').html('<div class="alert alert-success alert-dismissible" role="alert">'+
-                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-                    response.messages + 
-                    '</div>');
-                } else {
-                    // display error messages
-                    $('#messages').html('<div class="alert alert-warning alert-dismissible" role="alert">'+
-                    '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-                    response.messages + 
-                    '</div>');
-                }
-            }
-        });
-    }
-}
 function searchProducts() {
   var search = $('#searchName').val();
-  manageTable.ajax.url(base_url + 'products/fetchProductData?search=' + search).load();
+  manageTable.ajax.url(base_url + 'partItems/fetchProductData?search=' + search).load();
 }
 
 function decreaseQuantity(product_id) {
     if(product_id) {
         $.ajax({
-            url: 'partItems/decreaseQuantity',
+            url: base_url+'partItems/decreaseQuantity',
             type: 'post',
             data: {product_id: product_id},
             dataType: 'json',
