@@ -170,6 +170,12 @@ $j(document).ready(function() {
             }
         },
         {
+            text: 'Barcode PDF',
+            action: function (e, dt, node, config) {
+                generateAllBarcodesPDF(dt.rows().data().toArray());
+            }
+        },
+        {
             extend: 'excel',
             exportOptions: {
                 columns: ':visible:not(:eq(0)):not(:eq(6)):not(:eq(7)):not(:last-child)' // Exclude columns 0, 6, 7, and last column
@@ -393,6 +399,72 @@ function decreaseQuantity(product_id) {
             }
         });
     }
+}
+
+function generateAllBarcodesPDF(data) {
+    var docDefinition = {
+        content: [],
+        styles: {
+            header: {
+                fontSize: 18,
+                bold: true,
+                margin: [0, 0, 0, 10]
+            },
+            subheader: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 10, 0, 5]
+            },
+            tableExample: {
+                margin: [0, 5, 0, 15]
+            }
+        },
+        defaultStyle: {
+            fontSize: 10
+        }
+    };
+
+    docDefinition.content.push({ text: 'Product Barcodes', style: 'header' });
+
+    data.forEach(function(row, index) {
+        var canvas = document.createElement('canvas');
+        JsBarcode(canvas, row[1], {  // Assuming SKU is in the second column (index 1)
+            format: "CODE128",
+            width: 2,
+            height: 30,
+            displayValue: true
+        });
+
+        docDefinition.content.push({
+            columns: [
+                {
+                    image: canvas.toDataURL(),
+                    width: 150
+                },
+                {
+                    stack: [
+                        { text: 'Name: ' + row[2], style: 'subheader' },  // Assuming Name is in the third column (index 2)
+                        { text: 'SKU: ' + row[1] },   // Assuming SKU is in the second column (index 1)
+                        { text: 'Price: ' + row[3] }  // Assuming Price is in the fourth column (index 3)
+                    ],
+                    width: '*'
+                }
+            ],
+            margin: [0, 0, 0, 20]
+        });
+
+        if (index < data.length - 1) {
+            docDefinition.content.push({ canvas: [{ type: 'line', x1: 0, y1: 5, x2: 515, y2: 5, lineWidth: 1 }] });
+        }
+    });
+
+    // Add current datetime in UK/Pakistan timezone
+    var now = new Date();
+    var options = { timeZone: 'Europe/London', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    var dateTime = now.toLocaleString('en-GB', options);
+    docDefinition.content.push({ text: 'Generated on: ' + dateTime, alignment: 'right', fontSize: 8, margin: [0, 20, 0, 0] });
+
+    pdfMake.createPdf(docDefinition).download('all_product_barcodes.pdf');
 }
 </script>
 

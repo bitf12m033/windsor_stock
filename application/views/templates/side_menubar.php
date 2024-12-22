@@ -111,7 +111,7 @@
               </ul>
             </li>
           <?php endif; ?>
-          <?php if(in_array('createProduct', $user_permission) || in_array('updateProduct', $user_permission) || in_array('viewProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
+          <?php if(in_array('createPartItem', $user_permission) || in_array('updatePartItem', $user_permission) || in_array('viewPartItem', $user_permission) || in_array('deletePartItem', $user_permission)): ?>
             <li class="treeview" id="mainPartItemNav">
               <a href="#">
                 <i class="fa fa-database"></i>
@@ -121,16 +121,16 @@
                 </span>
               </a>
               <ul class="treeview-menu">
-                <?php if(in_array('createProduct', $user_permission)): ?>
+                <?php if(in_array('createPartItem', $user_permission)): ?>
                   <li id="addPartItemNav"><a href="<?php echo base_url('partItems/create') ?>"><i class="fa fa-circle-o"></i> Add Part Item</a></li>
                 <?php endif; ?>
-                <?php if(in_array('updateProduct', $user_permission) || in_array('viewProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
+                <?php if(in_array('updatePartItem', $user_permission) || in_array('viewProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
                 <li id="managePartItemNav"><a href="<?php echo base_url('partItems') ?>"><i class="fa fa-circle-o"></i> Manage Part Items</a></li>
                 <?php endif; ?>
-                <?php if(in_array('viewProduct', $user_permission) && !$this->session->userdata('is_admin')): ?>
+                <?php if(in_array('viewPartItem', $user_permission) && !$this->session->userdata('is_admin')): ?>
                   <li id="otherStoresPartItemNav"><a href="<?php echo base_url('partItems/other_stores') ?>"><i class="fa fa-circle-o"></i> Other Stores Part Items</a></li>
                 <?php endif; ?>
-                <?php if(in_array('viewProduct', $user_permission)): ?>
+                <?php if(in_array('viewPartItem', $user_permission)): ?>
                   <li id="soldPartItemNav"><a href="<?php echo base_url('partItems/sold_products') ?>"><i class="fa fa-circle-o"></i> Sold Part Items</a></li>
                 <?php endif; ?>
               </ul>

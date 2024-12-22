@@ -212,6 +212,21 @@
                         } ?>></td>
                       </tr>
                       <tr>
+                        <td>Part Items</td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="createPartItem" <?php if($serialize_permission) {
+                          if(in_array('createPartItem', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="updatePartItem" <?php if($serialize_permission) {
+                          if(in_array('updatePartItem', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="viewPartItem" <?php if($serialize_permission) {
+                          if(in_array('viewPartItem', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="deletePartItem" <?php if($serialize_permission) {
+                          if(in_array('deletePartItem', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                      </tr>
+                      <tr>
                         <td>Orders</td>
                         <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="createOrder" <?php if($serialize_permission) {
                           if(in_array('createOrder', $serialize_permission)) { echo "checked"; } 
