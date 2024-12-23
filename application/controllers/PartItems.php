@@ -25,7 +25,7 @@ class PartItems extends Admin_Controller
     */
 	public function index()
 	{
-        if(!in_array('viewProduct', $this->permission)) {
+        if(!in_array('viewPartItem', $this->permission)) {
             redirect('dashboard', 'refresh');
         }
 
@@ -53,21 +53,16 @@ class PartItems extends Admin_Controller
         foreach ($data as $key => $value) {
             $store_data = $this->model_stores->getStoresData($value['store_id']);
             $buttons = '';
-            if(in_array('updateProduct', $this->permission)) {
+            if(in_array('updatePartItem', $this->permission)) {
                 $buttons .= '<a href="'.base_url('partItems/update/'.$value['id']).'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
             }
 
-            if(in_array('deleteProduct', $this->permission)) { 
+            if(in_array('deletePartItem', $this->permission)) { 
                 $buttons .= ' <button type="button" class="btn btn-default" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>';
             }
             
-            // // Add button to mark as sold
-            // if(in_array('viewMarkSold', $this->permission) && $value['is_active'] == 1) {
-            //     $buttons .= ' <button type="button" class="btn btn-default" onclick="markAsSold('.$value['id'].')"><i class="fa fa-check"></i> Mark as Sold</button>';
-            // }
-
             // Add button to decrease quantity
-            if(in_array('updateProduct', $this->permission) && $value['quantity'] > 0) {
+            if(in_array('viewQuantityDecreaseBtn', $this->permission) && $value['quantity'] > 0) {
                 $buttons .= ' <button type="button" class="btn btn-default" onclick="decreaseQuantity('.$value['id'].')"><i class="fa fa-minus"></i> Decrease Qty</button>';
             }
 
@@ -107,7 +102,7 @@ class PartItems extends Admin_Controller
     */
 	public function create()
 	{
-		if(!in_array('createProduct', $this->permission)) {
+		if(!in_array('createPartItem', $this->permission)) {
             redirect('dashboard', 'refresh');
         }
 
@@ -204,7 +199,7 @@ class PartItems extends Admin_Controller
     */
 	public function update($id)
 	{      
-        if(!in_array('updateProduct', $this->permission)) {
+        if(!in_array('updatePartItem', $this->permission)) {
             redirect('dashboard', 'refresh');
         }
 
@@ -274,7 +269,7 @@ class PartItems extends Admin_Controller
     */
 	public function remove()
 	{
-        if(!in_array('deleteProduct', $this->permission)) {
+        if(!in_array('deletePartItem', $this->permission)) {
             redirect('dashboard', 'refresh');
         }
         
@@ -305,7 +300,7 @@ class PartItems extends Admin_Controller
     */
     public function other_stores()
     {
-        if(!in_array('viewProduct', $this->permission)) {
+        if(!in_array('viewPartItem', $this->permission)) {
             redirect('dashboard', 'refresh');
         }
 
@@ -332,11 +327,11 @@ class PartItems extends Admin_Controller
             $store_data = $this->model_stores->getStoresData($value['store_id']);
             // button
             $buttons = '';
-            if(in_array('updateProduct', $this->permission)) {
+            if(in_array('updatePartItem', $this->permission)) {
                 $buttons .= '<a href="'.base_url('partItems/update/'.$value['id']).'" class="btn btn-default"><i class="fa fa-pencil"></i></a>';
             }
 
-            if(in_array('deleteProduct', $this->permission)) { 
+            if(in_array('deletePartItem', $this->permission)) { 
                 $buttons .= ' <button type="button" class="btn btn-default" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>';
             }
 
@@ -399,7 +394,7 @@ class PartItems extends Admin_Controller
 
     public function sold_products()
     {
-        if(!in_array('viewProduct', $this->permission)) {
+        if(!in_array('viewPartItem', $this->permission)) {
             redirect('dashboard', 'refresh');
         }
     

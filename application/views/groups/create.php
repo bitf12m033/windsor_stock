@@ -109,11 +109,32 @@
                         <td><input type="checkbox" name="permission[]" id="permission" value="deleteProduct" class="minimal"></td>
                       </tr>
                       <tr>
+                        <td>Part Items</td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="createPartItem" class="minimal"></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="updatePartItem" class="minimal"></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="viewPartItem" class="minimal"></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="deletePartItem" class="minimal"></td>
+                      </tr>
+                      <tr>
                         <td>Orders</td>
                         <td><input type="checkbox" name="permission[]" id="permission" value="createOrder" class="minimal"></td>
                         <td><input type="checkbox" name="permission[]" id="permission" value="updateOrder" class="minimal"></td>
                         <td><input type="checkbox" name="permission[]" id="permission" value="viewOrder" class="minimal"></td>
                         <td><input type="checkbox" name="permission[]" id="permission" value="deleteOrder" class="minimal"></td>
+                      </tr>
+                      <tr>
+                        <td>Mark As Sold</td>
+                        <td> - </td>
+                        <td> - </td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="viewMarkSold" ></td>
+                        <td> - </td>
+                      </tr>
+                      <tr>
+                        <td>Decrease Quantity Button</td>
+                        <td> - </td>
+                        <td> - </td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="viewQuantityDecreaseBtn" ></td>
+                        <td> - </td>
                       </tr>
                       <tr>
                         <td>Reports</td>

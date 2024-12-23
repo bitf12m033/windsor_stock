@@ -244,10 +244,19 @@
                       <tr>
                         <td>Mark As Sold</td>
                         <td> - </td>
+                        <td> - </td>
                         <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="viewMarkSold" <?php if($serialize_permission) {
                           if(in_array('viewMarkSold', $serialize_permission)) { echo "checked"; } 
                         } ?>></td>
                         <td> - </td>
+                      </tr>
+                      <tr>
+                        <td>Decrease Quantity Button</td>
+                        <td> - </td>
+                        <td> - </td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="viewQuantityDecreaseBtn" <?php if($serialize_permission) {
+                          if(in_array('viewQuantityDecreaseBtn', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
                         <td> - </td>
                       </tr>
                       <tr>
