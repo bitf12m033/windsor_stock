@@ -423,8 +423,9 @@ class PartItems extends Admin_Controller
             $buttons = '';
         
             // Add button to mark for sale for administrator only
-            if($this->session->userdata('is_admin')) {
-                $buttons .= ' <button type="button" class="btn btn-warning" onclick="markForSale('.$value['id'].')"><i class="fa fa-undo"></i> Mark for Sale</button>';
+            if($this->session->userdata('is_admin')) {  
+                // Add button to update quantity
+                $buttons .= ' <button type="button" class="btn btn-default" onclick="updateQuantityModal('.$value['id'].', '.$value['quantity'].')" data-toggle="modal" data-target="#updateQuantityModal"><i class="fa fa-refresh"></i> Update Qty</button>';
             }
 
             $img = '<img src="'.base_url($value['image']).'" alt="'.$value['title'].'" class="img-circle" width="50" height="50" />';
@@ -461,30 +462,38 @@ class PartItems extends Admin_Controller
 
         echo json_encode($result);
     }
-    public function markForSale()
-    {
-        $product_id = $this->input->post('product_id');
 
-        $response = array();
-        if($product_id) {
-            $data = array('availability' => 1);
-            $update = $this->model_products->update($data, $product_id);
-            if($update == true) {
-                $response['success'] = true;
-                $response['messages'] = "Successfully marked for sale"; 
-            }
-            else {
-                $response['success'] = false;
-                $response['messages'] = "Error in the database while marking the product for sale";
-            }
+    // Add a new method to update quantity
+    public function updateQuantity()
+    {
+        if(!in_array('updatePartItem', $this->permission)) {
+            redirect('dashboard', 'refresh');
         }
-        else {
+        
+        $product_id = $this->input->post('product_id');
+        $quantity = $this->input->post('quantity');
+        
+        $response = array();
+        if($product_id && is_numeric($quantity) && $quantity >= 0) {
+            $data = array(
+                'quantity' => $quantity
+            );
+            $update = $this->model_part_items->update($data, $product_id);
+            if($update) {
+                $response['success'] = true;
+                $response['messages'] = 'Quantity updated successfully';
+            } else {
+                $response['success'] = false;
+                $response['messages'] = 'Error in the database while updating the product quantity';
+            }
+        } else {
             $response['success'] = false;
-            $response['messages'] = "Refresh the page again!!";
+            $response['messages'] = 'Invalid product ID or quantity value';
         }
 
         echo json_encode($response);
     }
+
     public function check_sku_unique()
     {
         $sku = $this->input->post('sku');

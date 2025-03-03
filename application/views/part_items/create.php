@@ -1,4 +1,18 @@
-
+<style>
+  .barcode-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  #barcode {
+    flex-grow: 1;
+  }
+  
+  #download-barcode {
+    margin-left: 10px;
+  }
+</style>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -72,7 +86,12 @@
                       <i class="fa fa-refresh" aria-hidden="true"></i>
                     </span>
                   </div>
-                  <svg id="barcode"></svg>
+                  <div class="barcode-container">
+                    <svg id="barcode"></svg>
+                    <a href="#" id="download-barcode" class="btn btn-sm btn-default" title="Download Barcode" style="display: none;">
+                      <i class="fa fa-download"></i>
+                    </a>
+                  </div>
                 </div>
 
                 <div class="form-group">
@@ -164,14 +183,23 @@
 
     $("#sku").on("input", function() {
       var value = $(this).val();
-      JsBarcode("#barcode", value, {
-        format: "CODE128",
-        displayValue: true,
-        fontSize: 16,
-        margin: 0,
-        width: 2,
-        height: 50
-      });
+      
+      // Only show barcode and download button if there's a value
+      if (value.trim() !== "") {
+        JsBarcode("#barcode", value, {
+          format: "CODE128",
+          displayValue: true,
+          fontSize: 16,
+          margin: 0,
+          width: 2,
+          height: 50
+        });
+        $("#download-barcode").show();
+      } else {
+        // Clear the barcode and hide download button if no value
+        $("#barcode").empty();
+        $("#download-barcode").hide();
+      }
 
       // Check SKU uniqueness
       $.ajax({
@@ -192,14 +220,7 @@
         }
       });
     });
-    // JsBarcode("#barcode", "123456789012", {
-    //             format: "CODE128",  // You can change the format
-    //             lineColor: "#000",
-    //             width: 2,
-    //             height: 100,
-    //             displayValue: true // Show the barcode value
-    //         });
-    
+
     var btnCust = '<button type="button" class="btn btn-secondary" title="Add picture tags" ' + 
         'onclick="alert(\'Call your custom code here.\')">' +
         '<i class="glyphicon glyphicon-tag"></i>' +
@@ -221,5 +242,50 @@
         allowedFileExtensions: ["jpg", "png", "gif"]
     });
 
+        // Handle barcode download
+        $("#download-barcode").on("click", function(e) {
+      e.preventDefault();
+      
+      // Get the SVG element
+      var svgElement = document.getElementById("barcode");
+      
+      // Create a canvas element
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+      
+      // Set canvas dimensions to match SVG
+      var svgRect = svgElement.getBoundingClientRect();
+      canvas.width = svgRect.width;
+      canvas.height = svgRect.height;
+      
+      // Create an image from the SVG
+      var img = new Image();
+      var svgData = new XMLSerializer().serializeToString(svgElement);
+      var svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+      var url = URL.createObjectURL(svgBlob);
+      
+      img.onload = function() {
+        // Draw the image on the canvas
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        
+        // Convert canvas to data URL and trigger download
+        var imgURL = canvas.toDataURL("image/png");
+        var link = document.createElement("a");
+        link.download = "barcode_" + $("#sku").val() + ".png";
+        link.href = imgURL;
+        link.click();
+        
+        // Clean up
+        URL.revokeObjectURL(url);
+      };
+      
+      img.src = url;
+    });
+
+    $("#sku").on("input", function() {
+      // ... existing code ...
+    });
   });
 </script>

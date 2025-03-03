@@ -110,6 +110,30 @@
     </div><!-- /.modal-dialog -->
   </div><!-- /.modal -->
 <?php endif; ?>
+<!-- Update Quantity Modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="updateQuantityModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Update Quantity</h4>
+      </div>
+      <form id="updateQuantityForm">
+        <div class="modal-body">
+          <input type="hidden" id="product_id" name="product_id">
+          <div class="form-group">
+            <label for="quantity">Quantity</label>
+            <input type="number" class="form-control" id="quantity" name="quantity" min="0" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 <style>
   /* Positioning the DataTable buttons to the top-center */
   div.dataTables_wrapper {
@@ -134,8 +158,57 @@
 <script type="text/javascript">
   var manageTable;
   var base_url = "<?php echo base_url(); ?>";
+  
 
   $j(document).ready(function() {
+
+    // Handle quantity update form submission
+    $j('#updateQuantityForm').on('submit', function(e) {
+      e.preventDefault();
+      
+      var productId = $j('#product_id').val();
+      var quantity = $j('#quantity').val();
+      
+      $j.ajax({
+        url: '<?php echo base_url('partItems/updateQuantity') ?>',
+        type: 'post',
+        data: {
+          product_id: productId,
+          quantity: quantity
+        },
+        dataType: 'json',
+        success: function(response) {
+          if (response.success) {
+            // Use vanilla JavaScript to hide the modal
+            document.getElementById('updateQuantityModal').classList.remove('in');
+            document.body.classList.remove('modal-open');
+            document.getElementsByClassName('modal-backdrop')[0].remove();
+            document.getElementById('updateQuantityModal').style.display = 'none';
+            
+            // Show success message
+            $j("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong>' + response.messages +
+              '</div>');
+            
+            // Refresh the table
+            manageTable.ajax.reload(null, false);
+          } else {
+            $j("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">' +
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+              '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>' + response.messages +
+              '</div>');
+          }
+        },
+        error: function() {
+          $j("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">' +
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+            '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>Error occurred during the update process' +
+            '</div>');
+        }
+      });
+    });
+    
     $j("#mainPartItemNav").addClass('active');
     $j("#soldPartItemNav").addClass('active');
 
@@ -262,35 +335,11 @@
     manageTable.ajax.url(base_url + 'partItems/fetchSoldProductsData?search=' + search).load();
   }
 
-  function markForSale(productId) {
-    if (productId) {
-      $.ajax({
-        url: base_url + 'partItems/markForSale',
-        type: 'post',
-        data: {
-          product_id: productId
-        },
-        dataType: 'json',
-        success: function(response) {
-          if (response.success === true) {
-            // Reload the DataTable
-            manageTable.ajax.reload(null, false);
-
-            // Display success message
-            $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">' +
-              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong>' + response.messages +
-              '</div>');
-          } else {
-            // Display error message
-            $("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">' +
-              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
-              '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>' + response.messages +
-              '</div>');
-          }
-        }
-      });
-    }
+  // Simplified function that just sets the values
+  function updateQuantityModal(id, currentQty) {
+    document.getElementById('product_id').value = id;
+    document.getElementById('quantity').value = currentQty;
+    // Let Bootstrap handle the modal display via data attributes
   }
 </script>
 

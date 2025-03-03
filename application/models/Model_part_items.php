@@ -28,6 +28,8 @@ class Model_part_items extends CI_Model
 		
 		$this->db->where('is_active', 1);
 		$this->db->where('is_deleted', 0);
+		$this->db->where('quantity >', 0);
+
 		if ($search) {
 			$this->db->group_start();
 			$this->db->like('title', $search);

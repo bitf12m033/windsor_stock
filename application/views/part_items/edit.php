@@ -1,4 +1,18 @@
-
+<style>
+  .barcode-container {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+  }
+  
+  #barcode {
+    flex-grow: 1;
+  }
+  
+  #download-barcode {
+    margin-left: 10px;
+  }
+</style>
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
@@ -78,7 +92,12 @@
                       <i class="fa fa-refresh" aria-hidden="true"></i>
                     </span>
                   </div>
-                  <svg id="barcode"></svg>
+                  <div class="barcode-container">
+                    <svg id="barcode"></svg>
+                    <a href="#" id="download-barcode" class="btn btn-sm btn-default" title="Download Barcode" style="display: <?php echo empty($product_data['sku']) ? 'none' : 'inline-block'; ?>;">
+                      <i class="fa fa-download"></i>
+                    </a>
+                  </div>
                 </div>
                 <div class="form-group">
                   <label for="ccost_price">Cost Price</label>
@@ -202,9 +221,11 @@
       var randomSKU = generateRandomSKU();
       $("#sku").val(randomSKU).trigger("input");
     });
-    function handleSKUInput(checkUniqueness = false) {
-      var originalSKU = "<?php echo $product_data['sku']; ?>";
-      var value = $("#sku").val();
+  function handleSKUInput(checkUniqueness = false) {
+    var originalSKU = "<?php echo $product_data['sku']; ?>";
+    var value = $("#sku").val();
+    
+    if (value.trim() !== "") {
       JsBarcode("#barcode", value, {
         format: "CODE128",
         displayValue: true,
@@ -213,28 +234,76 @@
         width: 2,
         height: 50
       });
-      if (checkUniqueness && value !== originalSKU) {
-        // Check SKU uniqueness
-        $.ajax({
-          url: '<?php echo base_url("partItems/check_sku_unique"); ?>',
-          method: 'POST',
-          data: { sku: value },
-          dataType: 'json',
-          success: function(response) {
-            if (!response.is_unique) {
-              $("#sku-error").remove();
-              $("#sku").closest('.input-group').parent().append('<div id="sku-error" class="text-danger">This IMEI is already in use. Please enter a unique IMEI.</div>');
-            } else {
-              $("#sku-error").remove();
-            }
-          },
-          error: function() {
-            console.error('Error checking SKU uniqueness');
-          }
-        });
-      }
+      $("#download-barcode").show();
+    } else {
+      // Clear the barcode and hide download button if no value
+      $("#barcode").empty();
+      $("#download-barcode").hide();
     }
+    
+    if (checkUniqueness && value !== originalSKU) {
+      // Check SKU uniqueness
+      $.ajax({
+        url: '<?php echo base_url("partItems/check_sku_unique"); ?>',
+        method: 'POST',
+        data: { sku: value },
+        dataType: 'json',
+        success: function(response) {
+          if (!response.is_unique) {
+            $("#sku-error").remove();
+            $("#sku").closest('.input-group').parent().append('<div id="sku-error" class="text-danger">This IMEI is already in use. Please enter a unique IMEI.</div>');
+          } else {
+            $("#sku-error").remove();
+          }
+        },
+        error: function() {
+          console.error('Error checking SKU uniqueness');
+        }
+      });
+    }
+  }
 
+   // Handle barcode download
+   $("#download-barcode").on("click", function(e) {
+      e.preventDefault();
+      
+      // Get the SVG element
+      var svgElement = document.getElementById("barcode");
+      
+      // Create a canvas element
+      var canvas = document.createElement("canvas");
+      var ctx = canvas.getContext("2d");
+      
+      // Set canvas dimensions to match SVG
+      var svgRect = svgElement.getBoundingClientRect();
+      canvas.width = svgRect.width;
+      canvas.height = svgRect.height;
+      
+      // Create an image from the SVG
+      var img = new Image();
+      var svgData = new XMLSerializer().serializeToString(svgElement);
+      var svgBlob = new Blob([svgData], {type: "image/svg+xml;charset=utf-8"});
+      var url = URL.createObjectURL(svgBlob);
+      
+      img.onload = function() {
+        // Draw the image on the canvas
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+        
+        // Convert canvas to data URL and trigger download
+        var imgURL = canvas.toDataURL("image/png");
+        var link = document.createElement("a");
+        link.download = "barcode_" + $("#sku").val() + ".png";
+        link.href = imgURL;
+        link.click();
+        
+        // Clean up
+        URL.revokeObjectURL(url);
+      };
+      
+      img.src = url;
+    });
   // Trigger on page load
   handleSKUInput();
 
@@ -247,8 +316,8 @@
     $(".select_group").select2();
     $("#description").wysihtml5();
 
-    $("#mainProductNav").addClass('active');
-    $("#manageProductNav").addClass('active');
+    $("#mainPartItemNav").addClass('active');
+    $("#managePartItemNav").addClass('active');
     
     var btnCust = '<button type="button" class="btn btn-secondary" title="Add picture tags" ' + 
         'onclick="alert(\'Call your custom code here.\')">' +
